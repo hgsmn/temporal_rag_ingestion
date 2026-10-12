@@ -23,7 +23,7 @@ from rag_ingestion.workers.common import connect, env_float, env_int, run_until_
 
 
 async def main() -> None:
-    client = await connect()
+    client = await connect(env_int("EMBEDDING_METRICS_PORT", 9467))
 
     worker = Worker(
         client,

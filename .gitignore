@@ -1,0 +1,23 @@
+# Secrets et configuration locale
+.env
+
+# Python : bytecode et caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environnements virtuels
+.venv/
+venv/
+
+# Packaging
+*.egg-info/
+build/
+dist/
+
+# Éditeurs et système
+.vscode/
+.idea/
+.DS_Store

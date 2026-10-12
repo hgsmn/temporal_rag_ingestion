@@ -22,8 +22,11 @@ def env_float(name: str, default: float) -> float:
     return float(os.environ.get(name, default))
 
 
-async def connect() -> Client:
+async def connect(metrics_port: int) -> Client:
     """Connexion au serveur Temporal, avec un endpoint Prometheus.
+
+    Chaque worker expose ses métriques sur son propre port, pour pouvoir
+    lancer les trois workers sur la même machine.
 
     Les métriques à surveiller pour le dimensionnement :
       - temporal_activity_schedule_to_start_latency : attente dans la queue
@@ -33,7 +36,7 @@ async def connect() -> Client:
     """
     runtime = Runtime(
         telemetry=TelemetryConfig(
-            metrics=PrometheusConfig(bind_address=f"0.0.0.0:{env_int('METRICS_PORT', 9464)}")
+            metrics=PrometheusConfig(bind_address=f"0.0.0.0:{metrics_port}")
         )
     )
     return await Client.connect(

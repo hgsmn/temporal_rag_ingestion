@@ -18,7 +18,7 @@ from rag_ingestion.workflows import WORKFLOWS
 
 
 async def main() -> None:
-    client = await connect()
+    client = await connect(env_int("INGESTION_METRICS_PORT", 9464))
 
     max_activity_slots = env_int("MAX_ACTIVITY_SLOTS", 50)
 

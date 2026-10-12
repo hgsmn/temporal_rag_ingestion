@@ -16,9 +16,14 @@ from temporalio.exceptions import ApplicationError
 from rag_ingestion.shared import BATCH_TOO_LARGE, OCR_BATCH, OcrBatchInput
 
 OCR_URL = os.environ.get("OCR_URL", "https://ocr.example.internal/v1/ocr")
+OCR_MODEL = os.environ.get("OCR_MODEL", "my-ocr-model")
+OCR_API_KEY = os.environ.get("OCR_API_KEY", "")
 
 # Un seul client HTTP par processus : réutilise les connexions.
-_http = httpx.AsyncClient(timeout=httpx.Timeout(120.0))
+_http = httpx.AsyncClient(
+    timeout=httpx.Timeout(float(os.environ.get("OCR_TIMEOUT_SECONDS", "120"))),
+    headers={"Authorization": f"Bearer {OCR_API_KEY}"} if OCR_API_KEY else {},
+)
 
 
 def _page_refs(inp: OcrBatchInput) -> list[str]:
@@ -45,7 +50,7 @@ async def ocr_batch(inp: OcrBatchInput) -> str:
         return _result_ref(inp)
 
     # TODO: selon l'API, envoyer les images elles-mêmes ou des URL présignées.
-    resp = await _http.post(OCR_URL, json={"images": pages})
+    resp = await _http.post(OCR_URL, json={"model": OCR_MODEL, "images": pages})
 
     if resp.status_code == 413:
         # Lot trop gros pour l'API : inutile de réessayer tel quel,
